@@ -12,6 +12,7 @@ import { usePortal } from '../lib/portal-context';
 import { summarise, type ScopedProject, type ScopeResult, type Summary } from '../lib/scope';
 import { useTitle } from '../lib/use-title';
 import Info from '../components/Info';
+import Select from '../components/Select';
 
 const PAGE = 100;
 
@@ -174,48 +175,46 @@ function Projects({ scope, datasets }: { scope: ScopeResult; datasets: DatasetIn
             <span className="label">Search</span>
             <input type="search" value={q} placeholder="Barangay, road, school, office…" onChange={(e) => setParam('q', e.target.value)} />
           </label>
-          <label className="field">
-            <span className="label">Program</span>
-            <select value={program} onChange={(e) => setParam('program', e.target.value)}>
-              <option value="">All programs</option>
-              {(Object.keys(summary.byDataset) as DatasetKey[]).map((k) => (
-                <option key={k} value={k}>{programName(k)} ({count(summary.byDataset[k]!.rows)})</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span className="label">Status</span>
-            <select value={status} onChange={(e) => setParam('status', e.target.value)}>
-              <option value="">Any status</option>
-              {BRIDGE_GROUPS.filter((g) => summary.groups[g].rows).map((g) => (
-                <option key={g} value={g}>{groups[g].label} ({count(summary.groups[g].rows)})</option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label="Program"
+            value={program}
+            onChange={(v) => setParam('program', v)}
+            options={[
+              { value: '', label: 'All programs', count: all.length },
+              ...(Object.keys(summary.byDataset) as DatasetKey[]).map((k) => ({ value: k, label: programName(k), count: summary.byDataset[k]!.rows })),
+            ]}
+          />
+          <Select
+            label="Status"
+            value={status}
+            onChange={(v) => setParam('status', v)}
+            options={[
+              { value: '', label: 'Any status', count: all.length },
+              ...BRIDGE_GROUPS.filter((g) => summary.groups[g].rows).map((g) => ({ value: g, label: groups[g].label, count: summary.groups[g].rows })),
+            ]}
+          />
           {offices.length > 1 && (
-            <label className="field">
-              <span className="label">DPWH office</span>
-              <select value={office} onChange={(e) => setParam('office', e.target.value)}>
-                <option value="">Any office</option>
-                {offices.map(([o, n]) => <option key={o} value={o}>{shortOffice(o)} ({count(n)})</option>)}
-              </select>
-            </label>
+            <Select
+              label="DPWH office"
+              value={office}
+              onChange={(v) => setParam('office', v)}
+              options={[{ value: '', label: 'Any office', count: all.length }, ...offices.map(([o, n]) => ({ value: o, label: shortOffice(o), count: n }))]}
+            />
           )}
           {reasons.length > 1 && (
-            <label className="field">
-              <span className="label">Listed because</span>
-              <select value={why} onChange={(e) => setParam('why', e.target.value)}>
-                <option value="">Any reason</option>
-                {reasons.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-              </select>
-            </label>
+            <Select
+              label="Listed because"
+              value={why}
+              onChange={(v) => setParam('why', v)}
+              options={[{ value: '', label: 'Any reason' }, ...reasons.map(([k, label]) => ({ value: k, label }))]}
+            />
           )}
-          <label className="field">
-            <span className="label">Sort by</span>
-            <select value={sort} onChange={(e) => setParam('sort', e.target.value === 'house' ? '' : e.target.value)}>
-              {(Object.keys(SORTS) as Sort[]).map((k) => <option key={k} value={k}>{SORTS[k].label}</option>)}
-            </select>
-          </label>
+          <Select
+            label="Sort by"
+            value={sort}
+            onChange={(v) => setParam('sort', v === 'house' ? '' : v)}
+            options={(Object.keys(SORTS) as Sort[]).map((k) => ({ value: k, label: SORTS[k].label }))}
+          />
         </div>
 
         {narrowed && (

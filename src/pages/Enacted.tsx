@@ -18,6 +18,7 @@ import { departmentShort, gaaCsv, gaaYearTotals, hasYear, loadGaa, type GaaResul
 import { usePortal, type Async } from '../lib/portal-context';
 import { useTitle } from '../lib/use-title';
 import Info from '../components/Info';
+import Select from '../components/Select';
 
 const PAGE = 100;
 const FIRST = GAA_YEARS[0];
@@ -272,20 +273,18 @@ function Programs({ result, placeList }: { result: GaaResult; placeList: string 
             <span className="label">Search</span>
             <input type="search" value={q} placeholder="Road, school, barangay, agency…" onChange={(e) => setParam('q', e.target.value)} />
           </label>
-          <label className="field">
-            <span className="label">Department</span>
-            <select value={dept} onChange={(e) => setParam('dept', e.target.value)}>
-              <option value="">All departments</option>
-              {departments.map(([id, d]) => <option key={id} value={id}>{d.label} ({count(d.rows)})</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span className="label">Year</span>
-            <select value={year ?? ''} onChange={(e) => setParam('year', e.target.value)}>
-              <option value="">All years</option>
-              {totals.map((t) => <option key={t.year} value={t.year}>{t.year} ({count(t.programs)})</option>)}
-            </select>
-          </label>
+          <Select
+            label="Department"
+            value={dept}
+            onChange={(v) => setParam('dept', v)}
+            options={[{ value: '', label: 'All departments', count: all.length }, ...departments.map(([id, d]) => ({ value: id, label: d.label, count: d.rows }))]}
+          />
+          <Select
+            label="Year"
+            value={year ? String(year) : ''}
+            onChange={(v) => setParam('year', v)}
+            options={[{ value: '', label: 'All years', count: all.length }, ...totals.map((t) => ({ value: String(t.year), label: String(t.year), count: t.programs }))]}
+          />
         </div>
         {narrowed && (
           <p className="filter-sums">
