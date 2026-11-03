@@ -9,6 +9,7 @@ const BETTERGOV_LOGO = '/brand/bettergov-horizontal-primary.png';
 
 const NAV = [
   { to: '/', hash: '', label: '2027 projects' },
+  { to: '/charts', hash: '', label: 'Charts' },
   { to: '/', hash: '#offices', label: 'Offices and districts' },
   { to: '/gaa', hash: '', label: 'Budgets 2020–2026' },
   { to: '/about', hash: '', label: 'About the data' },
