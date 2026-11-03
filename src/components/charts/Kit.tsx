@@ -9,6 +9,7 @@
 import { useState, type FocusEvent, type MouseEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { php } from '../../lib/format';
+import Info from '../Info';
 import { useTip, useWidth, type Series } from './tokens';
 
 export function TipRow({ color, label, value, ring }: { color?: string; label: ReactNode; value: ReactNode; ring?: boolean }) {
@@ -37,12 +38,12 @@ export function Legend({ items }: { items: { label: string; color: string; ring?
 export interface Table { head: string[]; rows: ReactNode[][] }
 
 /** A chart with its title, a note, and the same figures as a table. */
-export function ChartCard({ title, sub, note, table, wide, children }: { title: ReactNode; sub?: ReactNode; note?: ReactNode; table?: Table; wide?: boolean; children: ReactNode }) {
+export function ChartCard({ title, sub, note, info, table, wide, children }: { title: ReactNode; sub?: ReactNode; note?: ReactNode; info?: ReactNode; table?: Table; wide?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <figure className={`ccard${wide ? ' ccard-wide' : ''}`}>
       <figcaption>
-        <h3>{title}</h3>
+        <h3>{title}{info && <Info>{info}</Info>}</h3>
         {sub && <p className="csub">{sub}</p>}
       </figcaption>
       {children}
@@ -87,6 +88,9 @@ export interface HRow {
   muted?: boolean;
   /** Overrides the series colour (one series, rows that are themselves versions). */
   color?: string;
+  /** Makes the row a toggle (a drill-down below the chart) instead of a link. */
+  onSelect?: () => void;
+  active?: boolean;
   extra?: ReactNode;
 }
 
@@ -128,6 +132,8 @@ export function HBars({ rows, series, format = php }: { rows: HRow[]; series: Se
           const handlers = { onMouseMove: (e: MouseEvent) => tipShow(e, body), onFocus: (e: FocusEvent) => tipShow(e, body), onBlur: tipHide };
           return r.to ? (
             <Link key={r.key} to={r.to} className="hb-row" {...handlers}>{inner}</Link>
+          ) : r.onSelect ? (
+            <button key={r.key} type="button" className={`hb-row hb-button${r.active ? ' active' : ''}`} aria-pressed={!!r.active} onClick={r.onSelect} {...handlers}>{inner}</button>
           ) : (
             <div key={r.key} className="hb-row" tabIndex={0} {...handlers}>{inner}</div>
           );

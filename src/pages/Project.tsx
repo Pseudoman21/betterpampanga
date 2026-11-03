@@ -8,6 +8,7 @@ import { usePortal, type Async } from '../lib/portal-context';
 import { projectKey } from '../lib/scope';
 import { reportHref } from '../lib/report';
 import { useTitle } from '../lib/use-title';
+import Info from '../components/Info';
 
 const VERSIONS: Version[] = ['nep', 'hgab2', 'hgab3', 'api'];
 const FALLBACK_VERSION_LABELS: Record<Version, string> = {
@@ -93,7 +94,7 @@ function ProjectView({ env }: { env: Envelope<ProjectDetail> }) {
 
       <div className="project-grid">
         <section aria-labelledby="amounts-h">
-          <h2 id="amounts-h" className="section-h">Amount in each version, with the page it is on</h2>
+          <h2 id="amounts-h" className="section-h">Amount in each version, with the page it is on<Info>This line’s amount in each version of the budget, as published, with a link to the exact page of the source PDF so you can check it yourself. A dash means that version has no such line.</Info></h2>
           <table className="amounts">
             <tbody>
               {versions.map((v) => {
@@ -151,7 +152,7 @@ function ProjectView({ env }: { env: Envelope<ProjectDetail> }) {
               </div>
             )}
             <div>
-              <dt className="label">Why it is in this portal</dt>
+              <dt className="label">Why it is in this portal<Info>The reason this line was picked up: the documents list it under one of this portal’s DPWH offices, or its title names the place.</Info></dt>
               <dd>
                 {inScope ? (
                   <ReasonTags reasons={inScope.reasons} />

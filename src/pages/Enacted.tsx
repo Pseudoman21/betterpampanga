@@ -17,6 +17,7 @@ import { count, php, phpFull, plural } from '../lib/format';
 import { departmentShort, gaaCsv, gaaYearTotals, hasYear, loadGaa, type GaaResult, type GaaRow } from '../lib/gaa';
 import { usePortal, type Async } from '../lib/portal-context';
 import { useTitle } from '../lib/use-title';
+import Info from '../components/Info';
 
 const PAGE = 100;
 const FIRST = GAA_YEARS[0];
@@ -88,7 +89,7 @@ export default function Enacted() {
       )}
 
       <section className="section" aria-labelledby="gaa-notes-h">
-        <h2 id="gaa-notes-h" className="section-h">Reading these figures</h2>
+        <h2 id="gaa-notes-h" className="section-h">Reading these figures<Info>The rules behind every figure on this page: what is counted, what is matched by name, and what is kept apart.</Info></h2>
         <ul className="plain-list fine-list">
           <li>Amounts are the appropriations in each year’s GAA, in pesos. The GAA publishes them in thousands.</li>
           {places.length > 0 && (
@@ -131,6 +132,7 @@ function OfficeHistoryList({ list }: { list: Envelope<DistrictCard>[] }) {
     <section className="section" aria-labelledby="office-years-h">
       <h2 id="office-years-h" className="section-h">
         {offices.length === 1 ? 'The DPWH office’s budget, year by year' : `${count(offices.length)} DPWH offices’ budgets, year by year`}
+        <Info>Each office’s whole budget in each year’s General Appropriations Act (GAA), 2020–2026, with the 2027 NEP and House bill beside it. The GAA is the budget as signed into law: the authority to spend, not the money spent. The 2027 bars are not law yet and are never added to the enacted years.</Info>
       </h2>
       <p className="legend">
         <span><i className="sw sw-gaa" /> Enacted (GAA), whole office</span>
@@ -235,7 +237,7 @@ function Programs({ result, placeList }: { result: GaaResult; placeList: string 
   return (
     <>
       <section className="section" aria-labelledby="gaa-years-h">
-        <h2 id="gaa-years-h" className="section-h">By year: the programs that name {placeList}</h2>
+        <h2 id="gaa-years-h" className="section-h">By year: the programs that name {placeList}<Info>Each year’s total for the programs, activities and projects, in any department, whose name includes the place. A year counts only those funded above zero. Click a year to filter the list below. Years are side by side, never added.</Info></h2>
         <div className="ystrip" role="group" aria-label="Pick a year">
           {totals.map((t) => (
             <button
@@ -259,6 +261,7 @@ function Programs({ result, placeList }: { result: GaaResult; placeList: string 
         <div className="list-head">
           <h2 id="gaa-list-h" className="section-h">
             {narrowed ? `${count(filtered.length)} of ${plural(all.length, 'program')}` : `Every program and project (${count(all.length)})`}
+            <Info>Every program or project whose name includes the place, with its appropriation in each year. One row is one name in one agency; a renamed project shows as a new row. A dash means no appropriation under that name that year.</Info>
           </h2>
           <button type="button" className="button button-quiet" onClick={() => downloadText(`${config.id}-gaa-${FIRST}-${LAST}.csv`, gaaCsv(filtered))}>
             Download CSV{narrowed ? ` (${count(filtered.length)})` : ''}

@@ -462,3 +462,21 @@ code { font-family: var(--font-mono); font-size: 0.9em; background: var(--paper-
   .list-head { flex-direction: column; align-items: flex-start; gap: 4px; }
   .field { flex: 1 1 100%; }
 }
+
+/* ---------- Info (ⓘ) ---------- */
+.info { position: relative; display: inline-flex; vertical-align: middle; margin-left: 6px; font-family: var(--font-body); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; line-height: 1.45; }
+.info-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; padding: 0; margin: -4px 0; border: none; border-radius: 50%; background: none; color: var(--ink-mute); }
+.info-btn:hover, .info-btn[aria-expanded="true"] { color: var(--accent); background: var(--accent-soft); }
+.info-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 40;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(17, 21, 28, 0.18);
+  white-space: normal;
+  text-align: left;
+}

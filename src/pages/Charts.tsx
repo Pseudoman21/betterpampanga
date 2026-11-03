@@ -14,6 +14,7 @@ import { PageHead } from '../components/Chrome';
 import { ChartCard, Columns, HBars, Lines, type HRow } from '../components/charts/Kit';
 import { COLOR, TRIO, VERSIONS, countFmt, type Series } from '../components/charts/tokens';
 import ProjectMap, { type TownTotal } from '../components/charts/ProjectMap';
+import Repeats from '../components/charts/Repeats';
 import Units from '../components/charts/Units';
 import { count, php, phpDelta, phpFull, plural } from '../lib/format';
 import { departmentShort, gaaYearTotals, hasYear, loadGaa, type GaaResult } from '../lib/gaa';
@@ -195,7 +196,7 @@ function Charts2027({ scope, datasets }: { scope: ScopeResult; datasets: Dataset
       </PageHead>
 
       <div className="vs">
-        <ChartCard title="The two versions, side by side" sub={`Every line in this portal · NEP ${plural(summary.nep.rows, 'line')}, House bill ${plural(summary.house.rows, 'line')}`}>
+        <ChartCard title="The two versions, side by side" info="The total of every line in this portal in the National Expenditure Program (NEP), the budget the President submits, and in House Bill 10858, the version the House passed. They are two versions of one budget, so they are compared, never added." sub={`Every line in this portal · NEP ${plural(summary.nep.rows, 'line')}, House bill ${plural(summary.house.rows, 'line')}`}>
           <HBars
             series={[{ key: 'v', label: 'Amount', color: COLOR.house }]}
             rows={[
@@ -213,11 +214,11 @@ function Charts2027({ scope, datasets }: { scope: ScopeResult; datasets: Dataset
       <section className="section" aria-labelledby="where-h">
         <h2 id="where-h" className="section-h">Where it goes</h2>
         <div className="cgrid">
-          <ChartCard title="By program" sub="DPWH, farm-to-market roads, health facilities, irrigation" table={versionTable('Program', programRows)}>
+          <ChartCard title="By program" info="The four project lists the Budget API covers: DPWH infrastructure, farm-to-market roads (Department of Agriculture), health facilities (DOH) and irrigation (NIA). Click a program to see its projects." sub="DPWH, farm-to-market roads, health facilities, irrigation" table={versionTable('Program', programRows)}>
             <HBars rows={programRows} series={VERSIONS} />
           </ChartCard>
           <ChartCard
-            title="By DPWH office"
+            title="By DPWH office" info="The DPWH office each line is listed under in the budget documents. A district engineering office (DEO) builds in the districts it serves; Central Office lines are run from the national office but are here because their titles name the province. Farm roads, health and irrigation lines have no DPWH office."
             sub="The office the documents list each line under"
             note="A shared office (one that serves several districts) is shown whole, never split. Central Office lines are here because their titles name the province."
             table={versionTable('Office', officeRows)}
@@ -226,7 +227,7 @@ function Charts2027({ scope, datasets }: { scope: ScopeResult; datasets: Dataset
           </ChartCard>
           <ChartCard
             wide
-            title="By town named in the title"
+            title="By town named in the title" info="Each line is placed in the city or municipality its title names. The API does not yet say where a project is, so a title that names no town, or several, is shown apart and never split between towns. Click a town to search the project list for it."
             sub="Lines whose title names exactly one city or municipality"
             note={
               <>
@@ -240,7 +241,7 @@ function Charts2027({ scope, datasets }: { scope: ScopeResult; datasets: Dataset
           </ChartCard>
           <ChartCard
             wide
-            title="On the map"
+            title="On the map" info="Each circle is a town: its size is the House bill total of the lines that name only that town, drawn at the town centre (approximate). The small dots are lines whose title gives exact coordinates, coloured by the version they are in. Click a circle or dot to open its projects."
             sub={`Bubbles: the House bill amount of the lines that name each town alone · Pins: the ${count(pins.length)} lines whose title gives coordinates`}
             note="Town bubbles sit at the town proper. Click a bubble for that town’s projects, a pin for its project."
           >
@@ -260,41 +261,46 @@ function Charts2027({ scope, datasets }: { scope: ScopeResult; datasets: Dataset
         <div className="cgrid">
           <ChartCard
             wide
-            title="Every line, one square each"
+            title="Every line, one square each" info="One square for each line in this portal, grouped by how the NEP and the House bill compare: in the House bill only, in the NEP only, the same amount in both, higher, lower, and so on. Hover a square for its amounts; click it to open the project."
             sub="Grouped by what the House bill did to it · hover for the amounts, click to open"
             note="“In the House bill only” and “In the NEP only” are candidates to check, not confirmed insertions or deletions."
           >
             <Units rows={all} labels={groupLabels} />
           </ChartCard>
-          <ChartCard title="Amounts by status" sub="Each status’s lines, in each version" table={versionTable('Status', statusRows.map((r) => ({ ...r, label: groupLabels[r.key as BridgeGroup] })))}>
+          <ChartCard title="Amounts by status" info="For each status, the total of its lines in the NEP and in the House bill. “In the House bill only” lines have no NEP amount, and “In the NEP only” lines have no House bill amount, by definition." sub="Each status’s lines, in each version" table={versionTable('Status', statusRows.map((r) => ({ ...r, label: groupLabels[r.key as BridgeGroup] })))}>
             <HBars rows={statusRows} series={VERSIONS} />
           </ChartCard>
-          <ChartCard title="Amounts changed" sub="Lines in both versions whose amount moved, largest change first" table={projectTable(changed)}>
+          <ChartCard title="Amounts changed" info="Lines found in both versions with a different amount, largest change first. The signed figure after the office is the House bill amount minus the NEP amount." sub="Lines in both versions whose amount moved, largest change first" table={projectTable(changed)}>
             {changed.length ? <HBars rows={changed} series={VERSIONS} /> : <p className="state">No line changed amount.</p>}
           </ChartCard>
-          <ChartCard title="Largest lines in the House bill only" sub="Insertion candidates, by amount" table={projectTable(houseOnly, ['House bill'])}>
+          <ChartCard title="Largest lines in the House bill only" info="The biggest lines in the House bill that could not be matched to a line in the NEP. They are candidates to check, not confirmed insertions: a line can also be renamed or reworded between versions." sub="Insertion candidates, by amount" table={projectTable(houseOnly, ['House bill'])}>
             {houseOnly.length ? <HBars rows={houseOnly} series={[VERSIONS[1]]} /> : <p className="state">None.</p>}
           </ChartCard>
-          <ChartCard title="Largest lines in the NEP only" sub="Lines the House bill does not list, by NEP amount" table={projectTable(nepOnly, ['NEP'])}>
+          <ChartCard title="Largest lines in the NEP only" info="The biggest NEP lines that could not be matched to a line in the House bill. They are candidates to check, not confirmed removals: a line can also be renamed or reworded between versions." sub="Lines the House bill does not list, by NEP amount" table={projectTable(nepOnly, ['NEP'])}>
             {nepOnly.length ? <HBars rows={nepOnly} series={[VERSIONS[0]]} /> : <p className="state">None.</p>}
           </ChartCard>
         </div>
       </section>
 
+      <section className="section" aria-labelledby="repeats-h">
+        <h2 id="repeats-h" className="section-h">Amounts that repeat</h2>
+        <Repeats rows={all} />
+      </section>
+
       <section className="section" aria-labelledby="kind-h">
         <h2 id="kind-h" className="section-h">What kind of work</h2>
         <div className="cgrid">
-          <ChartCard title="By kind of work" sub="As the budget documents classify each line" note="A DPWH line’s kind is its program, activity or project (P/A/P) in the documents, not a reading of its title." table={versionTable('Kind of work', workRows)}>
+          <ChartCard title="By kind of work" info="Lines grouped by the program, activity or project (P/A/P) the budget documents file them under, such as flood control or access roads. It is the documents’ own classification, not a reading of each title." sub="As the budget documents classify each line" note="A DPWH line’s kind is its program, activity or project (P/A/P) in the documents, not a reading of its title." table={versionTable('Kind of work', workRows)}>
             <HBars rows={workRows} series={VERSIONS} />
           </ChartCard>
           <ChartCard
-            title="How big the lines are"
+            title="How big the lines are" info="How many lines fall in each size band, counted separately for the NEP and the House bill. It shows whether the money is spread over many small projects or a few large ones."
             sub="Number of lines in each size band, per version"
             table={{ head: ['Size', 'NEP lines', 'House bill lines'], rows: BINS.map((b, i) => [b.label, count(bins[i][0]), count(bins[i][1])]) }}
           >
             <Columns cats={BINS.map((b) => b.label)} series={VERSIONS} values={bins} format={countFmt} />
           </ChartCard>
-          <ChartCard wide title="The largest lines" sub="By the larger of the two amounts · status after the office" table={projectTable(largest)}>
+          <ChartCard wide title="The largest lines" info="The twelve biggest lines in this portal, by the larger of their two amounts, with their status. Click one to open its project page and the page of the budget document it is on." sub="By the larger of the two amounts · status after the office" table={projectTable(largest)}>
             <HBars rows={largest} series={VERSIONS} />
           </ChartCard>
         </div>
@@ -369,7 +375,7 @@ function OfficeYears({ list }: { list: Envelope<DistrictCard>[] }) {
   return (
     <ChartCard
       wide
-      title="Each DPWH office’s whole budget, by year"
+      title="Each DPWH office’s whole budget, by year" info="Each district engineering office’s total in each year’s General Appropriations Act (GAA), the budget as signed into law: the authority to spend, not the money spent. The 2027 figures are not law yet, so they are listed under the chart, not drawn."
       sub="Enacted (GAA), the office’s whole budget as the GAA lists it under that office"
       note={
         <>
@@ -416,7 +422,7 @@ function GaaCharts({ result, placeList }: { result: GaaResult; placeList: string
       <ChartCard
         wide
         title={`Programs and projects that name ${placeList}, by year`}
-        sub="By department · click a year for its ten largest"
+        sub="By department · click a year for its ten largest" info="Every program, activity or project in any department whose name includes the place, with its appropriation in each year’s GAA, stacked by department. A year counts only programs funded above zero. Names are matched, not places surveyed. Click a year for its ten largest."
         note="Names are matched, not places surveyed. Each year counts only programs with an appropriation above zero."
         table={{ head: ['Year', ...series.map((s) => s.label), 'Programs'], rows: GAA_YEARS.map((y, i) => [String(y), ...stack[i].map((v) => php(v)), count(totals[i].programs)]) }}
       >
@@ -441,14 +447,14 @@ function GaaCharts({ result, placeList }: { result: GaaResult; placeList: string
         )}
       </ChartCard>
       <ChartCard
-        title="How many were funded each year"
+        title="How many were funded each year" info="How many of the programs and projects that name the place had an appropriation above zero in each year’s GAA."
         sub={`Programs and projects naming ${placeList} with an appropriation`}
         table={{ head: ['Year', 'Programs'], rows: totals.map((t) => [String(t.year), count(t.programs)]) }}
       >
         <Columns cats={GAA_YEARS.map(String)} series={[{ key: 'n', label: 'Programs funded', color: COLOR.gaa }]} values={totals.map((t) => [t.programs])} format={countFmt} />
       </ChartCard>
       <ChartCard
-        title="Average size of a funded program"
+        title="Average size of a funded program" info="Each year’s total for the programs that name the place, divided by how many were funded that year. A rise can mean fewer but larger projects."
         sub="That year’s total divided by the programs funded"
         table={{ head: ['Year', 'Average'], rows: totals.map((t) => [String(t.year), php(t.programs ? t.amount / t.programs : null)]) }}
       >

@@ -16,6 +16,7 @@ import { count, php, phpDelta, plural } from '../lib/format';
 import { usePortal } from '../lib/portal-context';
 import type { QueryReport, ScopedProject } from '../lib/scope';
 import { Await, External } from './Bits';
+import Info from './Info';
 
 interface DistrictRow {
   id: string;
@@ -98,6 +99,7 @@ function Offices({ list, queries, projects }: { list: Envelope<DistrictCard>[]; 
     <>
       <h2 id="offices-h" className="section-h">
         {plural(offices.length, 'DPWH district engineering office')}, serving {plural(districtCount, 'legislative district')}
+        <Info>DPWH lists its money by the district engineering office (DEO) that does the work. Each card is one office: its 2027 figures, the status of its lines, and the legislative districts and representatives it serves. A shared office’s money is shown whole, never split between its districts.</Info>
       </h2>
       <p className="section-lede">
         DPWH lists its money by the district engineering office that does the work. Each office serves one or more legislative
@@ -146,19 +148,19 @@ function Office({ view }: { view: OfficeView }) {
 
       <dl className="ocard-figs">
         <div>
-          <dt className="label">In this portal</dt>
+          <dt className="label">In this portal<Info>How many of this portal’s lines the budget documents list under this office. Click to see them.</Info></dt>
           <dd>{lines ? <Link to={filter()} className="ocard-lines">{plural(lines, 'line')} →</Link> : <span className="muted">none</span>}</dd>
         </div>
         <div>
-          <dt className="label">NEP</dt>
+          <dt className="label">NEP<Info>The office’s named projects in the President’s budget (NEP).</Info></dt>
           <dd className="num">{php(f?.nep_php)}</dd>
         </div>
         <div>
-          <dt className="label">House bill</dt>
+          <dt className="label">House bill<Info>The office’s named projects in the House-passed bill (HB 10858).</Info></dt>
           <dd className="num stat-accent">{php(f?.hgab3_php)}</dd>
         </div>
         <div>
-          <dt className="label">Change</dt>
+          <dt className="label">Change<Info>House bill minus NEP for this office’s named projects. Lines whose two versions name different offices are left out.</Info></dt>
           <dd className="num">{phpDelta(change)}</dd>
         </div>
       </dl>

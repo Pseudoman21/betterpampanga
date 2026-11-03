@@ -11,6 +11,7 @@ import { count, php, phpDelta, plural } from '../lib/format';
 import { usePortal } from '../lib/portal-context';
 import { summarise, type ScopedProject, type ScopeResult, type Summary } from '../lib/scope';
 import { useTitle } from '../lib/use-title';
+import Info from '../components/Info';
 
 const PAGE = 100;
 
@@ -131,7 +132,7 @@ function Projects({ scope, datasets }: { scope: ScopeResult; datasets: DatasetIn
       <OfficesSection />
 
       <section className="section" aria-labelledby="groups-h">
-        <h2 id="groups-h" className="section-h">What the House bill did to them</h2>
+        <h2 id="groups-h" className="section-h">What the House bill did to them<Info>Each line is matched between the NEP and the House bill, then sorted into a status: in the House bill only, in the NEP only, the same amount, higher, lower, or a review case. Click a tile to filter the list below. “Only” statuses are candidates to check, not confirmed changes.</Info></h2>
         <div className="groups" role="group" aria-label="Filter by status">
           {BRIDGE_GROUPS.map((g) => {
             const cell = summary.groups[g];
@@ -161,6 +162,7 @@ function Projects({ scope, datasets }: { scope: ScopeResult; datasets: DatasetIn
         <div className="list-head">
           <h2 id="list-h" className="section-h">
             {narrowed ? `${count(filtered.length)} of ${plural(all.length, 'project')}` : `Every project (${count(all.length)})`}
+            <Info>Every 2027 line in this portal, with its amount in the NEP and the House bill and the change between them. A dash means that document has no such line, not zero. Open a project for the exact page of the source PDF. Filters stay in the address, so a filtered list can be shared.</Info>
           </h2>
           <button type="button" className="button button-quiet" onClick={() => downloadText(`${config.id}-fy2027-projects.csv`, projectsCsv(filtered))}>
             Download CSV{narrowed ? ` (${count(filtered.length)})` : ''}
@@ -292,22 +294,22 @@ function Stats({ summary, programName }: { summary: Summary; programName: (k: Da
   return (
     <dl className="stats">
       <div>
-        <dt className="label">Projects</dt>
+        <dt className="label">Projects<Info>Lines in the 2027 budget documents that belong to this portal: listed under its DPWH offices, or with titles that name the place. The breakdown is by program.</Info></dt>
         <dd className="stat num">{count(summary.rows)}</dd>
         <dd className="stat-sub">{programs || 'none'}</dd>
       </div>
       <div>
-        <dt className="label">NEP</dt>
+        <dt className="label">NEP<Info>National Expenditure Program: the budget the President submits to Congress. The total of this portal’s lines in it.</Info></dt>
         <dd className="stat num">{php(summary.nep.php)}</dd>
         <dd className="stat-sub">{plural(summary.nep.rows, 'project')} · the budget the President submits</dd>
       </div>
       <div>
-        <dt className="label">House bill</dt>
+        <dt className="label">House bill<Info>House Bill 10858: the budget as the House of Representatives passed it. Compared with the NEP, never added to it.</Info></dt>
         <dd className="stat num stat-accent">{php(summary.house.php)}</dd>
         <dd className="stat-sub">{plural(summary.house.rows, 'project')} · compared with the NEP, not added</dd>
       </div>
       <div>
-        <dt className="label">In the House bill only</dt>
+        <dt className="label">In the House bill only<Info>Lines in the House bill that could not be matched to any NEP line. They are insertion candidates to check, not confirmed insertions: a line can also be renamed between versions.</Info></dt>
         <dd className="stat num">{count(summary.groups.house_only.rows)}</dd>
         <dd className="stat-sub">{php(summary.groups.house_only.house_php)} · insertion candidates</dd>
       </div>
