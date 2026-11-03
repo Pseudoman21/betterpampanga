@@ -9,7 +9,7 @@ export default defineConfig({
   kind: "province",
   name: "Province of Pampanga",
   shortName: "Pampanga",
-  siteUrl: "https://pampanga-transparency-portal.vercel.app",
+  siteUrl: "https://betterpampanga.vercel.app",
   operator: {
     name: "Pseudoman21"
   },

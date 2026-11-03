@@ -1,4 +1,18 @@
-# Transparency Portal
+# Better Pampanga
+
+**Live:** [betterpampanga.vercel.app](https://betterpampanga.vercel.app) · Part of the
+[BetterGov.ph LGU Directory](https://lgu.bettergov.ph)
+
+The FY 2027 budget transparency portal for the **Province of Pampanga**: every budget
+line for the province's three DPWH district engineering offices, its four legislative
+districts and its towns, plus the enacted budgets from 2020 to 2026. It's built on the
+[BetterGov.ph Budget API](https://budget.bettergov.ph/docs) from the
+[bettergovph/transparency-portal](https://github.com/bettergovph/transparency-portal)
+template. The template's own documentation follows.
+
+---
+
+## About the template
 
 A small, forkable website that shows citizens **every FY 2027 budget project** for one
 LGU (province, city or municipality) or one DPWH district engineering office: what the
